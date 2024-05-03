@@ -1,0 +1,19 @@
+Operator = _{ Plus | Minus | Mult }
+Plus     =  { "+" }
+Minus    =  { "-" }
+Mult     =  { "*" }
+
+Integer = { Operator? ~ ASCII_DIGIT+ }
+
+UnaryExpr = { Operator ~ Term }
+
+BinaryExpr = { Term ~ (Operator ~ Term)+ }
+
+Expr = { BinaryExpr | UnaryExpr | Term }
+
+Term = _{ Integer | "(" ~ Expr ~ ")" }
+
+Program = _{ SOI ~ Expr ~ EOI }
+
+WHITESPACE = _{ " " | "\t" }
+EOF        = _{ EOI | ";" }
