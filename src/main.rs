@@ -7,7 +7,17 @@ fn line_parse(line: &str) {
 
     let chars = line.chars();
     for c in chars {
-        println!("{}", c);
+        if c.is_ascii_digit() {
+            println!("Digit: {}", c);
+        } else if c.is_ascii_uppercase() {
+            println!("Letter {}", c);
+        } else if c == '=' {
+            println!("Assign {}", c);
+        } else if c == '+' || c == '-' {
+            println!("Operator {}", c);
+        } else {
+            println!("\"{}\"", c);
+        }
     }
 }
 
