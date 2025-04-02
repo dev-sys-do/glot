@@ -4,6 +4,10 @@
 
 fn main() {
     let line = "10 LET C = 4 + 2";
+    let chars = line.chars();
 
     println!("{}", line);
+    for c in chars {
+        println!("{}", c);
+    }
 }
