@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "glot-tp"
+name = "glot"
 version = "0.1.0"
