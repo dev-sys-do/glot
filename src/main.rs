@@ -2,7 +2,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-fn line_parse(line: &str) {
+#[derive(Debug)]
+pub enum Error {
+    InvalidCharacter(char),
+}
+
+fn line_parse(line: &str) -> Result<(), Error> {
     println!("{}", line);
 
     let chars = line.chars();
@@ -29,13 +34,17 @@ fn line_parse(line: &str) {
             }
 
             _ => {
-                println!("Unsupported {}", c);
+                return Err(Error::InvalidCharacter(c));
             }
         }
     }
+
+    Ok(())
 }
 
-fn main() {
+fn main() -> Result<(), Error> {
     let line = "10 LET C = 4 + 2";
-    line_parse(line);
+    line_parse(line)?;
+
+    Ok(())
 }
