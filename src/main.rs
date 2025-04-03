@@ -18,6 +18,10 @@ pub enum Token {
 
     // Operators
     Equals, // assignment operator (not a comparator)
+    OperatorPlus,
+    OperatorMinus,
+    OperatorMultiply,
+    OperatorDivide,
 }
 
 #[derive(Debug)]
@@ -42,17 +46,24 @@ fn tokenize(line: &str) -> Result<Vec<Token>, Error> {
                 chars.next();
             }
 
-            '+' | '-' | '*' | '/' => {
-                println!("Operator {}", c);
-
-                // Move the iterator forward
+            '+' => {
+                tokens.push(Token::OperatorPlus);
                 chars.next();
             }
-
+            '-' => {
+                tokens.push(Token::OperatorMinus);
+                chars.next();
+            }
+            '*' => {
+                tokens.push(Token::OperatorMultiply);
+                chars.next();
+            }
+            '/' => {
+                tokens.push(Token::OperatorDivide);
+                chars.next();
+            }
             '=' => {
                 tokens.push(Token::Equals);
-
-                // Move the iterator forward
                 chars.next();
             }
 
