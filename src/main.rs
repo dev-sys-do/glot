@@ -24,6 +24,7 @@ pub enum Token {
 pub enum Error {
     InvalidCharacter(char),
     InvalidIdentifier(String),
+    InvalidNumber(String),
 }
 
 fn tokenize(line: &str) -> Result<Vec<Token>, Error> {
@@ -56,10 +57,26 @@ fn tokenize(line: &str) -> Result<Vec<Token>, Error> {
             }
 
             '0'..='9' => {
-                println!("Digit: {}", c);
+                // Build the string representing the number
+                let mut num_str = String::new();
 
-                // Move the iterator forward
-                chars.next();
+                // Start peeking into the character stream
+                while let Some(&ch) = chars.peek() {
+                    // Exit the loop as soon as the next character is *not* a digit
+                    if !ch.is_ascii_digit() {
+                        break;
+                    }
+
+                    // Accumulate digits into the number string
+                    num_str.push(ch);
+                    chars.next();
+                }
+
+                // Check that this is a valid number
+                match num_str.parse::<u64>() {
+                    Ok(num) => tokens.push(Token::Number(num)),
+                    Err(_) => return Err(Error::InvalidNumber(num_str)),
+                }
             }
 
             'A'..='Z' => {
