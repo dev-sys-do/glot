@@ -2,6 +2,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum Token {
+    // Keywords
+    KeywordLet, // LET
+
+    // Variable
+    // glot only supports single character variables
+    Identifier(char),
+
+    // Literals
+    Number(u64),
+
+    // Operators
+    Equals, // assignment operator (not a comparator)
+}
+
 #[derive(Debug)]
 pub enum Error {
     InvalidCharacter(char),
