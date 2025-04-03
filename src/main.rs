@@ -26,7 +26,7 @@ pub enum Error {
     InvalidIdentifier(String),
 }
 
-fn line_parse(line: &str) -> Result<Vec<Token>, Error> {
+fn tokenize(line: &str) -> Result<Vec<Token>, Error> {
     println!("{}", line);
 
     let mut tokens = Vec::new();
@@ -110,9 +110,25 @@ fn line_parse(line: &str) -> Result<Vec<Token>, Error> {
 
 fn main() -> Result<(), Error> {
     let line = "10 LET C = 4 + 2";
-    let tokens = line_parse(line)?;
+    let tokens = tokenize(line)?;
 
     println!("Tokens: {:?}", tokens);
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{Error, Token, tokenize};
+
+    #[test]
+    fn test_tokenizer_print() -> Result<(), Error> {
+        let line = "10 PRINT G";
+        let tokenized_line = [Token::KeywordPrint, Token::Identifier("G".to_string())];
+        let tokens = tokenize(&line)?;
+
+        assert_eq!(tokens, tokenized_line);
+
+        Ok(())
+    }
 }
