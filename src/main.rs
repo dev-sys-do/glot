@@ -141,7 +141,11 @@ mod tests {
     #[test]
     fn test_tokenizer_print() -> Result<(), Error> {
         let line = "10 PRINT G";
-        let tokenized_line = [Token::KeywordPrint, Token::Identifier("G".to_string())];
+        let tokenized_line = [
+            Token::Number(10),
+            Token::KeywordPrint,
+            Token::Identifier("G".to_string()),
+        ];
         let tokens = tokenize(&line)?;
 
         assert_eq!(tokens, tokenized_line);
