@@ -23,8 +23,10 @@ pub enum Error {
     InvalidCharacter(char),
 }
 
-fn line_parse(line: &str) -> Result<(), Error> {
+fn line_parse(line: &str) -> Result<Vec<Token>, Error> {
     println!("{}", line);
+
+    let mut tokens = Vec::new();
 
     let chars = line.chars();
     for c in chars {
@@ -38,7 +40,7 @@ fn line_parse(line: &str) -> Result<(), Error> {
             }
 
             '=' => {
-                println!("Assign {}", c);
+                tokens.push(Token::Equals);
             }
 
             '0'..='9' => {
@@ -55,12 +57,14 @@ fn line_parse(line: &str) -> Result<(), Error> {
         }
     }
 
-    Ok(())
+    Ok(tokens)
 }
 
 fn main() -> Result<(), Error> {
     let line = "10 LET C = 4 + 2";
-    line_parse(line)?;
+    let tokens = line_parse(line)?;
+
+    println!("Tokens: {:?}", tokens);
 
     Ok(())
 }
