@@ -5,7 +5,9 @@
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     // Keywords
-    KeywordLet, // LET
+    KeywordLet,   // LET
+    KeywordPrint, // PRINT
+    KeywordEnd,   // END
 
     // Variable
     // glot only supports single character variables
@@ -82,6 +84,9 @@ fn line_parse(line: &str) -> Result<Vec<Token>, Error> {
                 // Check if it's a keyword or variable
                 match ident.as_str() {
                     "LET" => tokens.push(Token::KeywordLet),
+                    "PRINT" => tokens.push(Token::KeywordPrint),
+                    "END" => tokens.push(Token::KeywordEnd),
+
                     _ => {
                         // If not a keyword, check if it's a valid single-char variable
                         if ident.len() == 1 {
