@@ -8,6 +8,16 @@ use std::io::BufReader;
 use std::path::Path;
 use std::path::PathBuf;
 
+use clap::Parser;
+
+#[derive(Parser)]
+#[command(version, about, long_about = None)]
+struct Cli {
+    /// glot source file
+    #[arg(short, long, value_name = "FILE")]
+    source: PathBuf,
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     // Keywords
@@ -38,6 +48,7 @@ pub enum Error {
     InvalidSourceFile(PathBuf),
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 struct GlotLine {
     tokens: Vec<Token>,
@@ -175,10 +186,14 @@ impl Glotter {
 }
 
 fn main() -> Result<(), Error> {
-    let line = "10 LET C = 4 + 2";
-//    let glotter = Glotter::new(vec![line])?;
+    let cli = Cli::parse();
 
-//    println!("Tokens: {:?}", glotter.lines);
+    let mut glotter = Glotter::new_from_file(&cli.source)?;
+    glotter.tokenize()?;
+
+    for line in glotter.lines {
+        println!("{:?}", line);
+    }
 
     Ok(())
 }
