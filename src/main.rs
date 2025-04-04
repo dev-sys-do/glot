@@ -139,11 +139,28 @@ impl GlotLine {
     }
 }
 
+#[derive(Debug, Clone)]
+struct Glotter {
+    lines: Vec<GlotLine>,
+}
+
+impl Glotter {
+    pub fn new(source_code: Vec<&str>) -> Result<Self, Error> {
+        let mut lines = Vec::new();
+
+        for line in &source_code {
+            lines.push(GlotLine::new(line)?);
+        }
+
+        Ok(Glotter { lines })
+    }
+}
+
 fn main() -> Result<(), Error> {
     let line = "10 LET C = 4 + 2";
-    let glot_line = GlotLine::new(line)?;
+    let glotter = Glotter::new(vec![line])?;
 
-    println!("Tokens: {:?}", glot_line.tokens);
+    println!("Tokens: {:?}", glotter.lines);
 
     Ok(())
 }
