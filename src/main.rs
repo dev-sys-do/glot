@@ -2,6 +2,12 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+use std::fs::File;
+use std::io::BufRead;
+use std::io::BufReader;
+use std::path::Path;
+use std::path::PathBuf;
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
     // Keywords
@@ -29,6 +35,7 @@ pub enum Error {
     InvalidCharacter(char),
     InvalidIdentifier(String),
     InvalidNumber(String),
+    InvalidSourceFile(PathBuf),
 }
 
 #[derive(Debug, Clone)]
@@ -141,26 +148,37 @@ impl GlotLine {
 
 #[derive(Debug, Clone)]
 struct Glotter {
+    source: PathBuf,
     lines: Vec<GlotLine>,
 }
 
 impl Glotter {
-    pub fn new(source_code: Vec<&str>) -> Result<Self, Error> {
-        let mut lines = Vec::new();
+    pub fn new_from_file(source_path: &Path) -> Result<Self, Error> {
+        Ok(Glotter {
+            source: source_path.to_path_buf(),
+            lines: Vec::new(),
+        })
+    }
 
-        for line in &source_code {
-            lines.push(GlotLine::new(line)?);
+    pub fn tokenize(&mut self) -> Result<(), Error> {
+        let source_file = File::open(self.source.clone())
+            .map_err(|_| Error::InvalidSourceFile(self.source.clone()))?;
+        let source = BufReader::new(source_file);
+
+        for line in source.lines() {
+            let line = line.unwrap();
+            self.lines.push(GlotLine::new(&line)?);
         }
 
-        Ok(Glotter { lines })
+        Ok(())
     }
 }
 
 fn main() -> Result<(), Error> {
     let line = "10 LET C = 4 + 2";
-    let glotter = Glotter::new(vec![line])?;
+//    let glotter = Glotter::new(vec![line])?;
 
-    println!("Tokens: {:?}", glotter.lines);
+//    println!("Tokens: {:?}", glotter.lines);
 
     Ok(())
 }
