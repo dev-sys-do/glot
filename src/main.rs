@@ -5,8 +5,10 @@
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
+use std::iter::Peekable;
 use std::path::Path;
 use std::path::PathBuf;
+use std::vec::IntoIter;
 
 use clap::Parser;
 
@@ -46,6 +48,40 @@ pub enum Error {
     InvalidIdentifier(String),
     InvalidNumber(String),
     InvalidSourceFile(PathBuf),
+    InvalidValueToken(Token),
+    EndOfInput,
+}
+
+// Helper to consume next token or return error
+fn consume_token(tokens_iter: &mut Peekable<IntoIter<Token>>) -> Result<Token, Error> {
+    tokens_iter.next().ok_or(Error::EndOfInput)
+}
+
+// glot expressions.
+// A glot expression can be assigned to a variable, or used as an operand.
+//   A, A + B pr A + B * 10 are valid expressions.
+//
+// The grammatical definition of an expression is:
+//   expression      ::= term { ( "+" | "-" | "*" | "/" ) term }
+// A glot expression always starts with a `term` (a variable or a number), followed by
+// a series of (`binary operator`, `term`) couples.
+
+// A number or a variable in an expression.
+// A, 10 and B in `A + 10 * B`
+#[derive(Debug, Clone, PartialEq)]
+pub enum Term {
+    Number(u64),
+    Variable(char),
+}
+
+impl Term {
+    pub fn new(tokens_iter: &mut Peekable<IntoIter<Token>>) -> Result<Self, Error> {
+        match consume_token(tokens_iter)? {
+            Token::Number(n) => Ok(Term::Number(n)),
+            Token::Identifier(v) => Ok(Term::Variable(v)),
+            t => Err(Error::InvalidValueToken(t)),
+        }
+    }
 }
 
 #[allow(dead_code)]
