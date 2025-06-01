@@ -106,6 +106,19 @@ impl BinaryOperator {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
+enum ExpressionItem {
+    Term(Term),
+    Operator(BinaryOperator),
+}
+
+// A glot expression.
+// Example: `A + 10 * B` -> [Value(A), Operator(Add), Value(10), Operator(Multiply), Value(B)]
+#[derive(Debug, Clone, PartialEq)]
+struct Expression {
+    items: Vec<ExpressionItem>,
+}
+
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
 struct GlotLine {
