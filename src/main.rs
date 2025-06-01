@@ -27,7 +27,7 @@ pub enum Token {
 
     // Variable
     // glot only supports single character variables
-    Identifier(String),
+    Identifier(char),
 
     // Literals
     Number(u64),
@@ -138,7 +138,12 @@ impl GlotLine {
                         _ => {
                             // If not a keyword, check if it's a valid single-char variable
                             if ident.len() == 1 {
-                                tokens.push(Token::Identifier(ident));
+                                tokens.push(Token::Identifier(
+                                    ident
+                                        .chars()
+                                        .next()
+                                        .ok_or(Error::InvalidIdentifier(ident))?,
+                                ));
                             } else {
                                 // Multi-char variable is an error
                                 return Err(Error::InvalidIdentifier(ident));
@@ -208,7 +213,7 @@ mod tests {
         let expected_tokens = [
             Token::Number(10),
             Token::KeywordPrint,
-            Token::Identifier("G".to_string()),
+            Token::Identifier('G'),
         ];
 
         let glot_line = GlotLine::new(&line)?;
