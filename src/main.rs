@@ -42,7 +42,7 @@ pub enum Token {
     OperatorDivide,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Error {
     InvalidCharacter(char),
     InvalidIdentifier(String),
@@ -300,7 +300,7 @@ fn main() -> Result<(), Error> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Error, GlotLine, Token};
+    use crate::{BinaryOperator, Error, Expression, ExpressionItem, GlotLine, Term, Token};
 
     #[test]
     fn test_tokenizer_print_var() -> Result<(), Error> {
@@ -313,6 +313,87 @@ mod tests {
 
         let glot_line = GlotLine::new(&line)?;
         assert_eq!(glot_line.tokens, expected_tokens);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_expression_arithmetic() -> Result<(), Error> {
+        let line = "A + 10 * B";
+        let expected_items = [
+            ExpressionItem::Term(Term::Variable('A')),
+            ExpressionItem::Operator(BinaryOperator::Add),
+            ExpressionItem::Term(Term::Number(10)),
+            ExpressionItem::Operator(BinaryOperator::Multiply),
+            ExpressionItem::Term(Term::Variable('B')),
+        ];
+
+        let glot_line = GlotLine::new(&line)?;
+        let expression = Expression::new(&mut glot_line.tokens.into_iter().peekable())?;
+
+        assert_eq!(
+            expression,
+            Expression {
+                items: expected_items.to_vec()
+            }
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_expression_variable() -> Result<(), Error> {
+        let line = "A";
+        let expected_items = [ExpressionItem::Term(Term::Variable('A'))];
+
+        let glot_line = GlotLine::new(&line)?;
+        let expression = Expression::new(&mut glot_line.tokens.into_iter().peekable())?;
+
+        assert_eq!(
+            expression,
+            Expression {
+                items: expected_items.to_vec()
+            }
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_invalid_expression_assign() -> Result<(), Error> {
+        let line = "A = 5";
+
+        let glot_line = GlotLine::new(&line)?;
+        assert_eq!(
+            Expression::new(&mut glot_line.tokens.into_iter().peekable()),
+            Err(Error::InvalidOperatorToken(Token::Equals))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_invalid_expression_statement() -> Result<(), Error> {
+        let line = "LET A = 5";
+
+        let glot_line = GlotLine::new(&line)?;
+        assert_eq!(
+            Expression::new(&mut glot_line.tokens.into_iter().peekable()),
+            Err(Error::InvalidValueToken(Token::KeywordLet))
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_invalid_expression_keyword() -> Result<(), Error> {
+        let line = "PRINT";
+
+        let glot_line = GlotLine::new(&line)?;
+        assert_eq!(
+            Expression::new(&mut glot_line.tokens.into_iter().peekable()),
+            Err(Error::InvalidValueToken(Token::KeywordPrint))
+        );
 
         Ok(())
     }
