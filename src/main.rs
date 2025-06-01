@@ -200,19 +200,19 @@ fn main() -> Result<(), Error> {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Error, Token, tokenize};
+    use crate::{Error, GlotLine, Token};
 
     #[test]
-    fn test_tokenizer_print() -> Result<(), Error> {
+    fn test_tokenizer_print_var() -> Result<(), Error> {
         let line = "10 PRINT G";
-        let tokenized_line = [
+        let expected_tokens = [
             Token::Number(10),
             Token::KeywordPrint,
             Token::Identifier("G".to_string()),
         ];
-        let tokens = tokenize(&line)?;
 
-        assert_eq!(tokens, tokenized_line);
+        let glot_line = GlotLine::new(&line)?;
+        assert_eq!(glot_line.tokens, expected_tokens);
 
         Ok(())
     }
