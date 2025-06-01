@@ -47,6 +47,7 @@ pub enum Error {
     InvalidCharacter(char),
     InvalidIdentifier(String),
     InvalidNumber(String),
+    InvalidOperatorToken(Token),
     InvalidSourceFile(PathBuf),
     InvalidValueToken(Token),
     EndOfInput,
@@ -80,6 +81,27 @@ impl Term {
             Token::Number(n) => Ok(Term::Number(n)),
             Token::Identifier(v) => Ok(Term::Variable(v)),
             t => Err(Error::InvalidValueToken(t)),
+        }
+    }
+}
+
+// Operators used within expressions
+#[derive(Debug, Clone, PartialEq)]
+pub enum BinaryOperator {
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
+}
+
+impl BinaryOperator {
+    pub fn new(tokens_iter: &mut Peekable<IntoIter<Token>>) -> Result<Self, Error> {
+        match consume_token(tokens_iter)? {
+            Token::OperatorPlus => Ok(BinaryOperator::Add),
+            Token::OperatorMinus => Ok(BinaryOperator::Subtract),
+            Token::OperatorMultiply => Ok(BinaryOperator::Multiply),
+            Token::OperatorDivide => Ok(BinaryOperator::Divide),
+            t => Err(Error::InvalidOperatorToken(t)),
         }
     }
 }
