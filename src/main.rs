@@ -119,6 +119,30 @@ struct Expression {
     items: Vec<ExpressionItem>,
 }
 
+impl Expression {
+    pub fn new(tokens_iter: &mut Peekable<IntoIter<Token>>) -> Result<Self, Error> {
+        let mut items = Vec::new();
+
+        // First item must be a term
+        let first_term = Term::new(tokens_iter)?;
+        items.push(ExpressionItem::Term(first_term));
+
+        loop {
+            if let Some(_token) = tokens_iter.peek() {
+                let operator = BinaryOperator::new(tokens_iter)?;
+                let term = Term::new(tokens_iter)?;
+
+                items.push(ExpressionItem::Operator(operator));
+                items.push(ExpressionItem::Term(term));
+            } else {
+                break;
+            }
+        }
+
+        Ok(Expression { items })
+    }
+}
+
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
 struct GlotLine {
