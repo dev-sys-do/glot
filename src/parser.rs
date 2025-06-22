@@ -7,7 +7,7 @@ use crate::consume_token;
 use crate::tokenizer::Token;
 
 use std::iter::Peekable;
-use std::vec::IntoIter;
+use std::slice::Iter;
 
 // glot expressions.
 // A glot expression can be assigned to a variable, or used as an operand.
@@ -27,7 +27,7 @@ pub enum Term {
 }
 
 impl Term {
-    pub fn new(tokens_iter: &mut Peekable<IntoIter<Token>>) -> Result<Self, Error> {
+    pub fn new(tokens_iter: &mut Peekable<Iter<Token>>) -> Result<Self, Error> {
         match consume_token(tokens_iter)? {
             Token::Number(n) => Ok(Term::Number(n)),
             Token::Identifier(v) => Ok(Term::Variable(v)),
@@ -46,7 +46,7 @@ pub enum BinaryOperator {
 }
 
 impl BinaryOperator {
-    pub fn new(tokens_iter: &mut Peekable<IntoIter<Token>>) -> Result<Self, Error> {
+    pub fn new(tokens_iter: &mut Peekable<Iter<Token>>) -> Result<Self, Error> {
         match consume_token(tokens_iter)? {
             Token::OperatorPlus => Ok(BinaryOperator::Add),
             Token::OperatorMinus => Ok(BinaryOperator::Subtract),
@@ -71,7 +71,7 @@ struct Expression {
 }
 
 impl Expression {
-    pub fn new(tokens_iter: &mut Peekable<IntoIter<Token>>) -> Result<Self, Error> {
+    pub fn new(tokens_iter: &mut Peekable<Iter<Token>>) -> Result<Self, Error> {
         let mut items = Vec::new();
 
         // First item must be a term
@@ -116,7 +116,7 @@ mod tests {
         ];
 
         let glot_line = GlotLine::new(&line)?;
-        let expression = Expression::new(&mut glot_line.tokens.into_iter().peekable())?;
+        let expression = Expression::new(&mut glot_line.tokens().iter().peekable())?;
 
         assert_eq!(
             expression,
@@ -134,7 +134,7 @@ mod tests {
         let expected_items = [ExpressionItem::Term(Term::Variable('A'))];
 
         let glot_line = GlotLine::new(&line)?;
-        let expression = Expression::new(&mut glot_line.tokens.into_iter().peekable())?;
+        let expression = Expression::new(&mut glot_line.tokens().iter().peekable())?;
 
         assert_eq!(
             expression,
@@ -152,7 +152,7 @@ mod tests {
 
         let glot_line = GlotLine::new(&line)?;
         assert_eq!(
-            Expression::new(&mut glot_line.tokens.into_iter().peekable()),
+            Expression::new(&mut glot_line.tokens().iter().peekable()),
             Err(Error::InvalidOperatorToken(Token::Equals))
         );
 
@@ -165,7 +165,7 @@ mod tests {
 
         let glot_line = GlotLine::new(&line)?;
         assert_eq!(
-            Expression::new(&mut glot_line.tokens.into_iter().peekable()),
+            Expression::new(&mut glot_line.tokens().iter().peekable()),
             Err(Error::InvalidValueToken(Token::KeywordLet))
         );
 
@@ -178,7 +178,7 @@ mod tests {
 
         let glot_line = GlotLine::new(&line)?;
         assert_eq!(
-            Expression::new(&mut glot_line.tokens.into_iter().peekable()),
+            Expression::new(&mut glot_line.tokens().iter().peekable()),
             Err(Error::InvalidValueToken(Token::KeywordPrint))
         );
 

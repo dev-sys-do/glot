@@ -4,7 +4,7 @@
 
 use std::iter::Peekable;
 use std::path::PathBuf;
-use std::vec::IntoIter;
+use std::slice::Iter;
 
 pub mod parser;
 pub mod tokenizer;
@@ -23,6 +23,6 @@ pub enum Error {
 }
 
 // Helper to consume next token or return error
-fn consume_token(tokens_iter: &mut Peekable<IntoIter<Token>>) -> Result<Token, Error> {
-    tokens_iter.next().ok_or(Error::EndOfInput)
+fn consume_token(tokens_iter: &mut Peekable<Iter<Token>>) -> Result<Token, Error> {
+    tokens_iter.next().ok_or(Error::EndOfInput).cloned()
 }
