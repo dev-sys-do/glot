@@ -19,6 +19,7 @@ pub enum Error {
     InvalidOperatorToken(Token),
     InvalidSourceFile(PathBuf),
     InvalidValueToken(Token),
+    UnexpectedToken(Token),
     EndOfInput,
 }
 
