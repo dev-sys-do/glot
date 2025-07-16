@@ -17,6 +17,7 @@ pub enum Token {
 
     // Literals
     Number(u64),
+    StringLiteral(String),
 
     // Operators
     Equals, // assignment operator (not a comparator)

@@ -66,7 +66,7 @@ enum ExpressionItem {
 // A glot expression.
 // Example: `A + 10 * B` -> [Value(A), Operator(Add), Value(10), Operator(Multiply), Value(B)]
 #[derive(Debug, Clone, PartialEq)]
-struct Expression {
+pub struct Expression {
     items: Vec<ExpressionItem>,
 }
 
@@ -93,6 +93,73 @@ impl Expression {
         Ok(Expression { items })
     }
 }
+
+// Represents a complete, parsed command in `glot`.
+// This is the output of the parser, built from Tokens and Expressions.
+#[derive(Debug, Clone)] // PartialEq might be tricky due to Vec in Expression
+pub enum Statement {
+    // LET <VAR> = <expression>
+    Let {
+        variable: char,
+        expression: Expression,
+    },
+
+    // PRINT "<string>"
+    PrintString { value: String },
+
+    // PRINT <expression>
+    PrintExpr { expression: Expression },
+
+    // END
+    End,
+}
+
+impl Statement {
+    pub fn new(tokens: Vec<Token>) -> Result<Self, Error> {
+        let mut tokens_iter = tokens.into_iter().peekable();
+        let first_token = consume_token(&mut tokens_iter)?;
+
+        match first_token {
+            Token::KeywordLet => {
+                // LET <VAR> = <expression>
+                let variable = match consume_token(&mut tokens_iter)? {
+                    Token::Identifier(v) => v,
+                    t => return Err(Error::UnexpectedToken(t)),
+                };
+
+                match consume_token(&mut tokens_iter)? {
+                    // Next token must be an Equals
+                    Token::Equals => (),
+                    t => return Err(Error::UnexpectedToken(t)),
+                };
+
+                let expression = Expression::new(&mut tokens_iter)?;
+                Ok(Statement::Let { variable, expression })
+            }
+
+            Token::KeywordPrint => {
+                // PRINT <StringLiteral>
+                if let Some(Token::StringLiteral(_)) = tokens_iter.peek().cloned() {
+                    match consume_token(&mut tokens_iter)? {
+                        Token::StringLiteral(s) => Ok(Statement::PrintString { value: s }),
+                        _ => unreachable!(), // Should have been caught by peek
+                    }
+                } else {
+                    unreachable!()
+                }
+            }
+
+            Token::KeywordEnd => Ok(Statement::End),
+
+            t => Err(Error::UnexpectedToken(t)),
+        }
+    }
+}
+
+//pub type Program = HashMap<u32, Statement>;
+
+// Variables are stored mapping the identifier char to its f64 value
+//pub type Variables = HashMap<char, f64>;
 
 #[cfg(test)]
 mod tests {
