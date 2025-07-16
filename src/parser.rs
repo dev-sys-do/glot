@@ -184,7 +184,7 @@ mod tests {
         ];
 
         let glot_line = GlotLine::new(&line)?;
-        let expression = Expression::new(&mut glot_line.tokens.into_iter().peekable())?;
+        let expression = Expression::new(&mut glot_line.tokens().into_iter().peekable())?;
 
         assert_eq!(
             expression,
@@ -202,7 +202,7 @@ mod tests {
         let expected_items = [ExpressionItem::Term(Term::Variable('A'))];
 
         let glot_line = GlotLine::new(&line)?;
-        let expression = Expression::new(&mut glot_line.tokens.into_iter().peekable())?;
+        let expression = Expression::new(&mut glot_line.tokens().into_iter().peekable())?;
 
         assert_eq!(
             expression,
@@ -220,7 +220,7 @@ mod tests {
 
         let glot_line = GlotLine::new(&line)?;
         assert_eq!(
-            Expression::new(&mut glot_line.tokens.into_iter().peekable()),
+            Expression::new(&mut glot_line.tokens().into_iter().peekable()),
             Err(Error::InvalidOperatorToken(Token::Equals))
         );
 
@@ -233,7 +233,7 @@ mod tests {
 
         let glot_line = GlotLine::new(&line)?;
         assert_eq!(
-            Expression::new(&mut glot_line.tokens.into_iter().peekable()),
+            Expression::new(&mut glot_line.tokens().into_iter().peekable()),
             Err(Error::InvalidValueToken(Token::KeywordLet))
         );
 
@@ -246,7 +246,7 @@ mod tests {
 
         let glot_line = GlotLine::new(&line)?;
         assert_eq!(
-            Expression::new(&mut glot_line.tokens.into_iter().peekable()),
+            Expression::new(&mut glot_line.tokens().into_iter().peekable()),
             Err(Error::InvalidValueToken(Token::KeywordPrint))
         );
 

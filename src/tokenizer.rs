@@ -139,6 +139,10 @@ impl GlotLine {
 
         Ok(GlotLine { tokens })
     }
+
+    pub fn tokens(&self) -> Vec<Token> {
+        self.tokens.clone()
+    }
 }
 
 #[cfg(test)]
