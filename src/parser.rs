@@ -145,7 +145,8 @@ impl Statement {
                         _ => unreachable!(), // Should have been caught by peek
                     }
                 } else {
-                    unreachable!()
+                    let expression = Expression::new(&mut tokens_iter)?;
+                    Ok(Statement::PrintExpr { expression })
                 }
             }
 
